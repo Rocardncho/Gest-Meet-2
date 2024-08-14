@@ -1,0 +1,7 @@
+.corps{
+  background-color: red;
+}
+.custom-alert{
+  background-color: #ffcccc; /* Rouge clair (rouge mélangé avec du blanc) */
+  color: #8b0000; /* Couleur du texte */
+}
