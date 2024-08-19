@@ -43,7 +43,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 </head>
 <body  class="hold-transition sidebar-mini layout-fixed">
   <!-- Preloader -->
-
   <?php
     $username = $_SESSION['username'];
     require_once "connexion.php";
