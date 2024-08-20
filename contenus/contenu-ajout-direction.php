@@ -35,7 +35,7 @@
         <?php if (!isset($_GET['modDirection'])) { ?>
           onsubmit="return confirm('Êtes-vous sûr de vouloir ajouter cette sous-direction ?')"
         <?php }else { ?>
-          onsubmit="return confirm('Êtes-vous sûr de vouloir modifier cette sous-direction ?')">
+          onsubmit="return confirm('Êtes-vous sûr de vouloir modifier cette sous-direction ?')"
         <?php } ?>
         >
 <?php

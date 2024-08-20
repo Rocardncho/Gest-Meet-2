@@ -467,7 +467,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
                                 VALUES('$direction')";
                       $exe_requete= $con->query($requete);
                       if ($exe_requete) {
-                        echo "<h2 class='bg-success'><center>La direction a bien été ajoutée!</center></h2>";
+                        echo "<h2 class='bg-success'><center>La direction a bien été ajoutée!</center></h2>
+                        <center>
+                          <a href='javascript:history.go(-1)'class='bg-secondary'>Voir la liste des directions</a>
+                        </center>
+                        ";
                       }else {
                         echo "Echec d'ajout de la direction";
                             }
@@ -477,8 +481,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
         $direction = $_POST['direction'];
         $idDirection=$_POST['idDirection'];
         //VERIFICATI0N
-      if ($idDirection<>0) {
-        // code...
+    //  if ($idDirection<>0) {
         $requete="SELECT * FROM directions
         WHERE libelle_direction = '$direction' AND is_deleted=FALSE";
         $exe_requete= $con->query($requete);
@@ -486,7 +489,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
           if ($exe_requete->rowCount() > 0) {
             $row= $exe_requete->fetch(PDO::FETCH_ASSOC);
                     ?>
-            <h2 class='bg-danger'>La <?php echo $direction ?> excite déjà !
+            <h2 class='bg-danger'>La <?php echo $direction ?> existe déjà !
             </h2>
             <div class="">
               <center>
@@ -494,9 +497,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
             </center>
             </div>
                     <?php
-                    exit(0);
-          }//fin if
-        }// fin if($idDirection<>0)
+          }else{
+      //  }// fin if($idDi
           //requete UDATE prepareée de jointure
           $requete = "UPDATE directions
                     SET
@@ -575,6 +577,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
   }else {
           echo "Echec de la modification";
                             }
+      } // fin else
   }// fin elseif (isset($_POST['bt_modif_direct']))
   elseif (isset($_POST['bt_modif_motPase'])) {
       $motPasse=$_POST['motPasse'];
@@ -882,45 +885,82 @@ $resultatUtilisateurs = $statementUtilisateurs->execute($params);
     } // FIN else {UPDATE
   }//fin elseif bt_modif
         //Ajut de pste
-        elseif (isset($_POST['bt_ajout_post'])) {
-          $idDirection = $_POST['select_direct'];
-          $poste = $_POST['poste'];
-          //VERIFICATI0N
-          $requete="SELECT * FROM postes AS p
-          INNER JOIN directions AS d ON
-          d.id_direction = p.directions_id
-          WHERE (p.libelle_poste = '$poste') AND p.directions_id= $idDirection AND p.is_deleted=FALSE
-        ";
-          $exe_requete= $con->query($requete);
-          //si le poste est répéyé
-            if ($exe_requete->rowCount() > 0) {
-              $row= $exe_requete->fetch(PDO::FETCH_ASSOC);
-                      ?>
-              <h2 class='bg-danger'>Le postte de <?php echo $poste ?> excite déjà dans la <?php echo $row['libelle_direction'] ?>  !
-              </h2>
-              <div class="">
-                <center>
-                <a href="javascript:history.go(-1)"class="bg-secondary">Retour</a>
-              </center>
-            </div>
-                      <?php
-                      exit(0);
-            }//fin if
-          // insertion du poste dans la table postes
-          $requete="INSERT INTO postes (directions_id,libelle_poste)
-                  VALUES($idDirection,'$poste')";
-        $exe_requete= $con->query($requete);
-        if (!$exe_requete) {
-                  echo "Echec d'ajout de l'utilisateur l'erreur au niveau du post";
+elseif (isset($_POST['bt_ajout_post'])) {
+    // Activer le rapport d'erreurs pour voir tous les avertissements ou erreurs
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
+    $idDirection = $_POST['select_direct'];
+    $poste = $_POST['poste'];
+    // VERIFICATION
+    try {
+        // Préparation de la requête avec des paramètres pour éviter les injections SQL
+        $requete = "SELECT * FROM postes AS p
+                    INNER JOIN directions AS d ON d.id_direction = p.directions_id
+                    WHERE p.libelle_poste = :poste AND p.directions_id = :idDirection AND p.is_deleted = FALSE";
+
+        // Préparation de la requête
+        $stmt = $con->prepare($requete);
+
+        // Liaison des paramètres
+        $stmt->bindParam(':poste', $poste, PDO::PARAM_STR);
+        $stmt->bindParam(':idDirection', $idDirection, PDO::PARAM_INT);
+      } catch (Exception $e) {
+          echo "Erreur SQL : " . $e->getMessage();
           exit(0);
-        }else {
-          echo "<h2 class='bg-success'><center>Le poste a bien été ajouté!</center></h2>
-          <center>
-          <a href='javascript:history.go(-1)'class='bg-secondary'>Retour</a>
-        </center>
-          ";
+      }
+        // Débogage - Avant l'exécution de la requête
+        //echo "Avant l'exécution de la requête.<br>";
+        // Exécution de la requête
+        if (!$stmt->execute()) {
+            // Si l'exécution échoue, afficher les erreurs SQL
+            echo "Erreur SQL : " . implode(", ", $stmt->errorInfo());
+            exit(0);
         }
-      }//fin elseil bt_ajout_post
+        // Débogage - Après l'exécution de la requête
+        //echo "Après l'exécution de la requête.<br>";
+        // Vérification des résultats
+        if ($stmt->rowCount() > 0) {
+            // Récupération de la première ligne de résultat
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            ?>
+            <h2 class='bg-danger'>
+                <center>Le poste de <?php echo $poste; ?> existe déjà dans la <?php echo $row['libelle_direction']; ?></center>
+            </h2>
+            <div>
+                <center>
+                    <a href="javascript:history.go(-1)" class="bg-secondary">Retour</a>
+                </center>
+            </div>
+<?php }else{
+  // insertion du poste dans la table postes
+try {
+// Préparation de la requête avec des paramètres
+$requete = "INSERT INTO postes (directions_id, libelle_poste)
+          VALUES (:idDirection, :poste)";
+// Préparation de la requête
+$stmt = $con->prepare($requete);
+// Liaison des paramètres
+$stmt->bindParam(':idDirection', $idDirection, PDO::PARAM_INT);
+$stmt->bindParam(':poste', $poste, PDO::PARAM_STR);
+
+// Exécution de la requête
+if ($stmt->execute()) {
+  echo "<h2 class='bg-success'><center>Le poste a bien été ajouté!</center></h2>
+        <center>
+        <a href='javascript:history.go(-1)' class='bg-secondary'>Voir la liste des postes</a>
+        </center>";
+} else {
+  echo "Échec de l'ajout du poste. Une erreur s'est produite.";
+  exit(0);
+}
+} catch (Exception $e) {
+echo "Erreur SQL : " . $e->getMessage();
+exit(0);
+}
+}//Fin else
+}//fin elseil bt_ajout_post
       elseif (isset($_POST['bt_modif_poste'])) {
         $idDirection = $_POST['select_direct'];
         $poste = $_POST['poste'];
@@ -943,9 +983,8 @@ $resultatUtilisateurs = $statementUtilisateurs->execute($params);
               <a href="javascript:history.go(-1)"class="bg-secondary">Retour</a>
             </center>
             </div>
-                    <?php
-                    exit(0);
-          }//fin if
+          <?php
+        }else{
           //requete UDATE prepareée de jointure
           $requete = "UPDATE postes
                     SET
@@ -1036,6 +1075,7 @@ $resultatUtilisateurs = $statementUtilisateurs->execute($params);
                       }else {
                         echo "Echec de la modification";
                             }
+          } // fin else
       }// fin elseif (isset($_POST['bt_modif_poste']))
 }//fin si method POST
 if ($_SERVER['REQUEST_METHOD']==='GET') {
@@ -1201,7 +1241,7 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
                  WHERE id_direction='$idDirection'";
                 $exe= $con->query($requete);
                       if ($exe) {
-                              echo "<h2 class='bg-success'>la direction a bien été supprimé!!!</h2>
+                              echo "<h2 class='bg-success'><center>la direction a bien été supprimé!!!</center></h2>
                                 <center>
                                   <a href='javascript:history.go(-1)'class='bg-secondary'>Retour</a>
                                 </center>
@@ -1212,4 +1252,3 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
             } // fin elseif (isset($_GET['supDirection'])
 }//fin if method GET
  ?>
-</center></h2

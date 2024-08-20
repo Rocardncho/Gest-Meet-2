@@ -43,9 +43,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 </head>
 <body  class="hold-transition sidebar-mini layout-fixed">
   <!-- Preloader -->
+
  <div class="preloader flex-column justify-content-center align-items-center">
    <img class="animation__shake" src="dist/img/ordi.png" alt="AdminLTELogo" height="150" width="150">
  </div>
+
   <?php
     $username = $_SESSION['username'];
     require_once "connexion.php";
