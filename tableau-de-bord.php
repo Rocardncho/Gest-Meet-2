@@ -124,7 +124,16 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
           <?php } ?>
           </a>
           <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header"><?php echo $row['total']; ?> Notification(s)</span>
+            <span class="dropdown-item dropdown-header">
+              <?php if($row['total'] > 0) {echo $row['total'];}
+              if ($row['total'] == 1) {
+                 echo"   Notification</span>";
+              }elseif ($row['total'] > 1) {
+                echo"   Notifications</span>";
+              }else{
+              echo"   Pas de notification</span> ";
+              }
+                ?>
             <div class="dropdown-divider"></div>
             <?php
             $parametre2 = 'Nouvelle-reunion';
@@ -151,10 +160,17 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
               $exe_requete = $con->query($requete);
               if ($exe_requete) {
                 $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
-              ?>
-              <i class="fas fa-users mr-2"></i> <?php echo $row['total'] . " Nouvelle(s) réunion(s)";
               }
               ?>
+              <i class="fas fa-users mr-2"></i>
+              <?php if($row['total'] > 0) {echo $row['total'];}
+              if ($row['total'] == 1) {
+                 echo" Nouvelle réunion";
+              }elseif ($row['total'] > 1) {
+                echo" Nouvelles réunions";
+              }else{
+              echo"   Pas de nouvelle réunion ";
+              }  ?>
             </a>
             <div class="dropdown-divider"></div>
             <?php
@@ -181,7 +197,15 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
               $exe_requete = $con->query($requete);
               $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
               ?>
-              <i class="fas fa-file mr-2"></i> <?php echo $row['total']; ?> nouveau(x) compte-rendu(s)
+              <i class="fas fa-file mr-2"></i>
+              <?php if($row['total'] > 0) {echo $row['total'];}
+               if ($row['total'] == 1) {
+                  echo"  nouveau compte-rendu";
+               }elseif ($row['total'] > 1) {
+                 echo"  nouveaux compte-rendus";
+               }else{
+               echo"   Pas de nouveau compte-rendu ";
+               }   ?>
             </a>
             <div class="dropdown-divider"></div>
             <a href="notifications.php" class="dropdown-item dropdown-footer">Voir toutes les Notifications</a>
