@@ -187,7 +187,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                           OR d.id_direction=0)
                       AND contenu_notification LIKE'Un compte-rendu%'
                       AND date_notification = '$dateFormat'";
-                }else {
+                } else {
                   $requete = "SELECT COUNT(*) AS total FROM notifications AS n
                   INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
                   INNER JOIN directions AS d  ON d.id_direction=r.directions_id
