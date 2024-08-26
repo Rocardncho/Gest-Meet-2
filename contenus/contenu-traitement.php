@@ -24,14 +24,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
               <center>
               <a href='javascript:history.go(-1)' class='bg-secondary'>Réessayer</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               </center>";
-        exit(0);
     }
-
-    if (!is_writable($chemin)) {
+    elseif (!is_writable($chemin)) {
         die("Erreur : Le répertoire de destination n'est pas accessible en écriture.");
     }
-
-    if (move_uploaded_file($fichier_pdf['tmp_name'], $cheminFichier)) {
+    elseif (move_uploaded_file($fichier_pdf['tmp_name'], $cheminFichier)) {
 
   try{
         $requete = "UPDATE reunions SET compte_rendu='$cheminFichier'
@@ -51,15 +48,15 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
                             WHERE r.id_reunion = :select_id_date
                             AND r.id_reunion = :select_id_objet
                             AND r.compte_rendu = :cheminFichier";
-                          } catch (Exception $e) {
-                              echo "Erreur SQL : " . $e->getMessage();
-                              exit(0);
-                          }
                 $stmt = $con->prepare($requete);
                 $stmt->bindParam(':select_id_date', $select_id_date, PDO::PARAM_INT);
                 $stmt->bindParam(':select_id_objet', $select_id_objet, PDO::PARAM_INT);
                 $stmt->bindParam(':cheminFichier', $cheminFichier, PDO::PARAM_STR);
                 $stmt->execute();
+              } catch (Exception $e) {
+                echo "Erreur SQL : " . $e->getMessage();
+                  exit(0);
+            }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $idReunion = $row['id_reunion'];
                 $direction = $row['libelle_direction'];
@@ -72,37 +69,37 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
                 $sql = "SELECT reunion_id FROM notifications
                         WHERE reunion_id = $idReunion
                         AND contenu_notification LIKE 'Un compte%'";
-                      } catch (Exception $e) {
-                          echo "Erreur SQL : " . $e->getMessage();
-                          exit(0);
-                      }
                 $stmt2 = $con->query($sql);
+              } catch (Exception $e) {
+                  echo "Erreur SQL : " . $e->getMessage();
+                  exit(0);
+              }
                 if ($stmt2->rowCount() > 0) {
                   try{
                     $sql = "DELETE FROM notifications
                             WHERE reunion_id = :idReunion
                             AND contenu_notification LIKE 'Un compte%'";
-                          } catch (Exception $e) {
-                              echo "Erreur SQL : " . $e->getMessage();
-                              exit(0);
-                          }
                     $stmt = $con->prepare($sql);
                     $stmt->bindParam(':idReunion', $idReunion, PDO::PARAM_INT);
                     $stmt->execute();
+                  } catch (Exception $e) {
+                      echo "Erreur SQL : " . $e->getMessage();
+                      exit(0);
+                  }
                 }
                 try{
                 $requete = "INSERT INTO notifications(reunion_id, date_notification, heure_notification, contenu_notification)
                             VALUES (:idReunion, :dateFormat, :heureFormat, :contenuNotification)";
-                          } catch (Exception $e) {
-                              echo "Erreur SQL : " . $e->getMessage();
-                              exit(0);
-                          }
                 $stmt = $con->prepare($requete);
                 $stmt->bindParam(':idReunion', $idReunion, PDO::PARAM_INT);
                 $stmt->bindParam(':dateFormat', $dateFormat, PDO::PARAM_STR);
                 $stmt->bindParam(':heureFormat', $heureFormat, PDO::PARAM_STR);
                 $stmt->bindParam(':contenuNotification', $contenuNotification, PDO::PARAM_STR);
                 $stmt->execute();
+              } catch (Exception $e) {
+                  echo "Erreur SQL : " . $e->getMessage();
+                  exit(0);
+              }
             } else {
                 echo "<center><h2 class='bg-info'>Le Compte-rendu a déjà été ajouté !</h2></center>";
                 echo "<center><a href='liste-des-comptes-rendus.php'>Voir la liste des comptes-rendus</a></center>";
