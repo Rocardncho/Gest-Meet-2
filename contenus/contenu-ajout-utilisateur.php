@@ -75,7 +75,7 @@
                 <?php if (empty($id)) { ?>
                   onsubmit="return confirm('Êtes-vous sûr de vouloir ajouter cet utilisateur ?')"
                 <?php }else { ?>
-                  onsubmit="return confirm('Êtes-vous sûr de vouloir modifier cet utilisateur ?')">
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir modifier cet utilisateur ?')"
                 <?php } ?>
                 >
                     <?php
@@ -144,7 +144,7 @@
                             <td colspan="2"><input type="text" id="majuscules" minlength="3" oninput="this.value = this.value.toUpperCase()" value="<?php echo isset($row1['prenom']) ? $row1['prenom'] : ''; ?>" name="prenom" size="45" required></td>
                             <td style="padding-left: 200px;">
                                 Voir la liste des comptes-rendus&nbsp;&nbsp;&nbsp;
-                                <input type="checkbox" name="voirComp"
+                                <input type="checkbox" name="voirComp"checked onclick="return false;" disabled
                                 <?php if (!empty($id)){if($isVoirCompChecked) echo 'checked';} else {echo 'checked';} ?>>
                             </td>
                         </tr>
