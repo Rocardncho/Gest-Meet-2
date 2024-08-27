@@ -629,7 +629,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
             <center>
                   <a href='javascript:history.go(-1)' class='bg-secondary'>Réessayer</a>
             </center>";
-            exit(0);
+                return; // Empêche le code suivant de s'exécuter sans quitter le script complètement
   }
          //requete pour selectionner si l'utilisateur esr répeté
           $requete="SELECT matricule,contact,mail FROM utilisateurs
