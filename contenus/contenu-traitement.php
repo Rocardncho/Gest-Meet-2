@@ -33,11 +33,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
   try{
         $requete = "UPDATE reunions SET compte_rendu='$cheminFichier'
                     WHERE id_reunion = $select_id_date";
-                  } catch (Exception $e) {
-                      echo "Erreur SQL : " . $e->getMessage();
-                      exit(0);
-                  }
             $exe_requete = $con->query($requete);
+          } catch (Exception $e) {
+              echo "Erreur SQL : " . $e->getMessage();
+              exit(0);
+          }
             if ($exe_requete->rowCount() > 0) {
                 echo "<center><h2 class='bg-success'>Le Compte-rendu a été enregistré avec succès</h2></center>";
                 echo "<center><a href='liste-des-comptes-rendus.php'>Voir la liste des comptes-rendus</a></center>";
@@ -629,8 +629,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
             <center>
                   <a href='javascript:history.go(-1)' class='bg-secondary'>Réessayer</a>
             </center>";
-      exit(0);
-  }
+  }else {
          //requete pour selectionner si l'utilisateur esr répeté
           $requete="SELECT matricule,contact,mail FROM utilisateurs
                      WHERE (matricule= '$matricule' OR contact='$contact' OR mail='$email') AND
@@ -879,7 +878,8 @@ $resultatUtilisateurs = $statementUtilisateurs->execute($params);
        } else {
            echo "Echec de la modification";
        }
-    } // FIN else {UPDATE
+     }// FIN else {UPDATE
+    } // fin else
   }//fin elseif bt_modif
         //Ajut de pste
 elseif (isset($_POST['bt_ajout_post'])) {
@@ -941,7 +941,10 @@ $stmt = $con->prepare($requete);
 // Liaison des paramètres
 $stmt->bindParam(':idDirection', $idDirection, PDO::PARAM_INT);
 $stmt->bindParam(':poste', $poste, PDO::PARAM_STR);
-
+} catch (Exception $e) {
+echo "Erreur SQL : " . $e->getMessage();
+exit(0);
+}
 // Exécution de la requête
 if ($stmt->execute()) {
   echo "<h2 class='bg-success'><center>Le poste a bien été ajouté!</center></h2>
@@ -950,11 +953,6 @@ if ($stmt->execute()) {
         </center>";
 } else {
   echo "Échec de l'ajout du poste. Une erreur s'est produite.";
-  exit(0);
-}
-} catch (Exception $e) {
-echo "Erreur SQL : " . $e->getMessage();
-exit(0);
 }
 }//Fin else
 }//fin elseil bt_ajout_post
@@ -1089,9 +1087,8 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
                 <a href='javascript:history.go(-1)'class='bg-secondary'>Retour</a>
               </center>
             ";
-            exit(0);
-      }
-      // supprimer definitivement dans la BDD
+      }else {
+          // supprimer definitivement dans la BDD
       $requete = "DELETE FROM UtilisateursRoles
          WHERE matricule_id = :oldMatricule";
       $statement = $con->prepare($requete);
@@ -1125,6 +1122,7 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
                 }else {
                 echo "Impossible de supprimer l'utilisateur";
                     }
+          }// fin else
         }//fin if (isset($_GET[id_supp]))
         elseif (isset($_GET['supReunion'])) {
           $idReunion=$_GET['supReunion'];
@@ -1142,8 +1140,7 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
                        <a href='javascript:history.go(-1)'class='bg-secondary'>Retour</a>
                      </center>
                    ";
-                  exit(0);
-             }
+     }else{
           // supprimer definitivement dans la BDD
           $requete = "DELETE FROM notifications
              WHERE reunion_id = :oldMatricule";
@@ -1172,6 +1169,7 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
              }else {
              echo "Impossible de supprimer";
                  }
+          }//fin else
         }//elseif
         elseif (isset($_GET['supCompte'])) {
         //recuperation de du parametre de l'url
@@ -1186,8 +1184,7 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
                       <a href='javascript:history.go(-1)'class='bg-secondary'>Retour</a>
                     </center>
                   ";
-                  exit(0);
-            }
+        }else{
             // supprimer definitivement dans la BDD
             $requete = "UPDATE reunions
             SET compte_rendu = NULL
@@ -1212,6 +1209,7 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
                       }else {
                       echo "Impossible de supprimer le compte-rendu";
                           }
+                  }// fin else
               }//fin if (isset($_GET[supCompte]))
           elseif (isset($_GET['supPoste'])) {
               // code...suppression du poste
