@@ -624,12 +624,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST')
       $exe_requete = $con->query($requete);
       $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
       $motPasse = $row ? $row['mot_de_passe'] : ''; // Assurez-vous que $row est défini avant d'accéder à $row['mot_de_passe']
-  } elseif ($motPasse !== $confirm_motPasse) {
+      } elseif ($motPasse !== $confirm_motPasse) {
       echo "<h2 class='bg-danger'><center>Les mots de passe ne correspondent pas.</center></h2>
             <center>
                   <a href='javascript:history.go(-1)' class='bg-secondary'>Réessayer</a>
             </center>";
-  }else {
+            exit(0);
+  }
          //requete pour selectionner si l'utilisateur esr répeté
           $requete="SELECT matricule,contact,mail FROM utilisateurs
                      WHERE (matricule= '$matricule' OR contact='$contact' OR mail='$email') AND
@@ -879,7 +880,6 @@ $resultatUtilisateurs = $statementUtilisateurs->execute($params);
            echo "Echec de la modification";
        }
      }// FIN else {UPDATE
-    } // fin else
   }//fin elseif bt_modif
         //Ajut de pste
 elseif (isset($_POST['bt_ajout_post'])) {

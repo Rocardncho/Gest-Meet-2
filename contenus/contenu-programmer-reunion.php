@@ -191,8 +191,27 @@ if ($directeurConnect) {
             </tr>
                                   <tr>
                                     <?php
-                                      // Réexécuter la requête pour la deuxième liste déroulante
-                                        $stmt->execute();
+                                    // Cas des chargés du compte rendu
+                                    if ($directeurConnect) {
+                                        $requete = "SELECT * FROM utilisateurs AS u
+                                            INNER JOIN UtilisateursRoles AS ur ON u.matricule = ur.matricule_id
+                                                    WHERE u.is_deleted = FALSE AND ur.role_id=3
+                                                    ORDER BY u.nom, u.prenom";
+                                                    $stmt = $con->prepare($requete);
+                                                   $stmt->execute();
+                                    } else {
+                                        $requete = "SELECT u.matricule, u.nom, u.prenom
+                                                    FROM directions AS d
+                                                    INNER JOIN postes AS p ON p.directions_id = d.id_direction
+                                                    INNER JOIN utilisateurs AS u ON p.id_poste = u.poste_id
+                                                    INNER JOIN UtilisateursRoles AS ur ON u.matricule = ur.matricule_id
+                                                    WHERE d.libelle_direction = :libelle_direction AND u.is_deleted = FALSE
+                                                          AND ur.role_id=3
+                                                    ORDER BY u.nom, u.prenom";
+                                                    $stmt = $con->prepare($requete);
+                                                        $stmt->bindParam(':libelle_direction', $rowId['libelle_direction'], PDO::PARAM_STR);
+                                                         $stmt->execute();
+                                            }
                                     ?>
                                     <td> <label for="">-- Chargé du compte-rendu:</label> </td>
                                     <td> <select class="" name="charge" required>
