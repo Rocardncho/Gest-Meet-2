@@ -206,7 +206,7 @@ if ($directeurConnect) {
                                                     INNER JOIN utilisateurs AS u ON p.id_poste = u.poste_id
                                                     INNER JOIN UtilisateursRoles AS ur ON u.matricule = ur.matricule_id
                                                     WHERE d.libelle_direction = :libelle_direction AND u.is_deleted = FALSE
-                                                          AND ur.role_id=3
+                                                          AND ur.role_id=3 
                                                     ORDER BY u.nom, u.prenom";
                                                     $stmt = $con->prepare($requete);
                                                         $stmt->bindParam(':libelle_direction', $rowId['libelle_direction'], PDO::PARAM_STR);
