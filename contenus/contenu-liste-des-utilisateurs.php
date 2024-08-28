@@ -26,14 +26,15 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header">
+              <?php  if ($directeurConnect || $adminRole || $ajoutUserRole) { ?>
               <a href="ajout-utilisateur.php">
                 <h3 class="card-title">Ajouter utilisateurs</h3>
               </a>
+            <?php } ?>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
               <!--************ Affichage du poste de directeur ******************* -->
-              <?php if ($directeurConnect || $adminRole) { ?>
               <div class="">
                 <table id="table">
                   <?php
@@ -62,11 +63,14 @@
                     </th>
                     <th>
                       <h4 style="color:#444444;">&nbsp;&nbsp;&nbsp;<?php echo $nom."  ".$prenom; ?>&nbsp;&nbsp;
+                          <?php if ($directeurConnect || $adminRole) { ?>
                         <a href="<?php echo $url ?>">
                           <i class="fa-solid fa-eye"></i>
                         </a>
+                      <?php } ?>
                       </h4>
                     </th>
+                    <?php if ($directeurConnect || $adminRole) { ?>
                     <th>
                       <?php
                          $url="ajout-utilisateur.php?id=".urlencode($matriculeDirecteur);
@@ -75,8 +79,8 @@
                         &nbsp;&nbsp;&nbsp;<a href="<?php echo $url ?>"><i class="fas fa-pen text-success">Modifier</i></a>
                       </div>
                     </th>
-                  </tr>
                   <?php } ?>
+                  </tr>
                 </table>
               </div>
               <?php }// FIN if ($directeurConnect || $adminRole) ?>
@@ -97,6 +101,7 @@
                       ?>
                     <th>Poste</th>
                     <th>Mise à jour</th>
+                    <?php  if ($directeurConnect || $adminRole || $ajoutUserRole) { ?>
                     <th>
                       <div class="d-flex justify-content-between">
                         <div class="text-success">Modifier</div>
@@ -105,6 +110,7 @@
                         <?php } ?>
                       </div>
                     </th>
+                  <?php } ?>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,7 +251,9 @@
                                   <td>".$Email."</td>
                                   <td>".$direction."</td>
                                   <td>".$poste."</td>
-                                  <td>".$formattedDate."</td>"; ?>
+                                  <td>".$formattedDate."</td>";
+
+                                  if ($directeurConnect || $adminRole || $ajoutUserRole) { ?>
                                   <td>
                                     <?php
                                     $id= $matricule;
@@ -269,7 +277,7 @@
                                  </div>
                             <!-- / La cellule de ma colonne action   -->
                                  </td>
-                                  <?php
+                               <?php }
                               }
                             }else {
                               echo "<center><h4 class='bg-danger'> Aucun utilisateur Enregistré !!! </h4></center>";

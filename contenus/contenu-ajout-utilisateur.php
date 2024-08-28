@@ -19,10 +19,14 @@
             <a href="liste-des-utilisateurs.php">Voir la liste des utilisateurs</a>
         </div>
         <div class=" ">
+        <?php if ($directeurConnect || $adminRole || $ajoutPosteRole) { ?>
             <a href="ajout-poste.php">Ajouter un poste</a>
+          <?php } ?>
         </div>
         <div class="">
+          <?php  if ($directeurConnect || $adminRole) { ?>
             <a href="ajout-direction.php">Ajouter une direction</a>
+          <?php } ?>
         </div>
     </div>
     <!-- /lien horizontal -->
@@ -123,11 +127,11 @@
                                 <input type="password" name="confirm_motPasse" <?php echo !isset($_GET['id']) ? "required" : ''; ?>>
                             </td>
                             <td style="padding-left: 200px;">
-                              <?php if ($directeurConnect || $adminRole) : ?>
-                                Administrateur&nbsp;&nbsp;&nbsp;
+                                Administrateur &nbsp;&nbsp;&nbsp;
                                 <input type="checkbox" name="admin"
-                                <?php if (!empty($id)){if ($isAdminChecked) echo 'checked';} ?>>
-                              <?php endif; ?>
+                                <?php if (!$directeurConnect && !$adminRole) {echo "disabled";}
+                                       if (!empty($id)){if ($isAdminChecked) echo 'checked';}
+                                 ?>>
                             </td>
                         </tr>
                         <tr>

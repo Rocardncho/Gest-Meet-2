@@ -21,7 +21,9 @@
      </div>
      <?php if (in_array(11, $roles) || in_array(12, $roles) ) : ?>
        <div class=" ">
+         <?php if ($directeurConnect || $adminRole || $ajoutUserRole) { ?>
           <a href="ajout-utilisateur.php">Ajouter un utilisateur</a>
+        <?php } ?>
        </div>
      <?php endif;
      if ($directeurConnect || $adminRole) : ?>

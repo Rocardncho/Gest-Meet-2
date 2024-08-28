@@ -369,8 +369,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                </a>
                <ul class="nav nav-treeview">
                    <?php
+                   $ajoutUserRole = false;
+                   $voirUserRole = false;
                    // Cas où l'utilisateur peut ajouter un utilisateur
-                   if (in_array(11, $roles) || in_array(12, $roles)) { ?>
+                   if (in_array(11, $roles) || in_array(12, $roles)) {
+                          $ajoutUserRole = true;
+                          $voirUserRole = true;                    ?>
                        <li class="nav-item">
                            <a href="ajout-utilisateur.php" class="nav-link">
                                <i class="far fa-circle nav-icon"></i>
@@ -378,9 +382,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                            </a>
                        </li>
                    <?php }
-
+                    $ajoutPosteRole = false;
                    // Cas où l'utilisateur peut ajouter des postes et directions
                    if (in_array(6, $roles) || in_array(10, $roles)) {
+                     $ajoutPosteRole = true;
                        if ($directeurConnect || $adminRole) { ?>
                        <li class="nav-item">
                            <a href="ajout-direction.php" class="nav-link">
@@ -396,9 +401,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                            </a>
                        </li>
                    <?php }
-
                    // Cas où l'utilisateur peut voir la liste des utilisateurs
-                   if (in_array(8, $roles) || in_array(9, $roles)) { ?>
+                   if (in_array(8, $roles) || in_array(9, $roles) || $ajoutUserRole) {
+                          $voirUserRole = true;  ?>
                        <li class="nav-item">
                            <a href="liste-des-utilisateurs.php" class="nav-link">
                                <i class="far fa-circle nav-icon"></i>
