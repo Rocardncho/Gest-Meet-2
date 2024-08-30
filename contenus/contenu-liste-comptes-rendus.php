@@ -73,7 +73,7 @@ if ($directeurConnect) {
               ON r.id_reunion = d.reunion_id
               INNER JOIN notifications AS n
              ON r.id_reunion = n.reunion_id
-                    WHERE n.date_notification='$dateFormat'
+                    WHERE n.date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'
                     AND r.compte_rendu IS NOT NULL
                     AND d.role_joue='Chargé du compte-rendu'
                           AND contenu_notification LIKE 'Un compte%'
@@ -112,7 +112,7 @@ if ($directeurConnect) {
                     ON r.id_reunion = d.reunion_id
                   INNER JOIN notifications AS n
                  ON r.id_reunion = n.reunion_id
-                 WHERE n.date_notification='$dateFormat'
+                 WHERE n.date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'
                  AND r.compte_rendu IS NOT NULL
                  AND (di.id_direction=".$rowId['id_direction']." or di.id_direction=0)
                  AND d.role_joue='Chargé du compte-rendu'

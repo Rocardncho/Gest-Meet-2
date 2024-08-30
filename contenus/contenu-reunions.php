@@ -111,7 +111,7 @@ if (!$directeurConnect) {
     } elseif (isset($_GET['parametre2'])) {
         $requete .= " INNER JOIN notifications AS n ON r.id_reunion = n.reunion_id
                       WHERE (d.libelle_direction = :libelle_direction
-                            OR d.id_direction=0) AND n.date_notification = :dateFormat
+                            OR d.id_direction=0) AND :dateFormat <= r.date_reunion
                       AND n.contenu_notification LIKE 'Une reunion%' AND n.is_deleted = FALSE
                       AND role_joue='Chargé du compte-rendu'
                       ORDER BY r.date_reunion";
@@ -157,7 +157,7 @@ if (!$directeurConnect) {
         ];
     } elseif (isset($_GET['parametre2'])) {
         $requete .= " INNER JOIN notifications AS n ON r.id_reunion = n.reunion_id
-                      WHERE n.date_notification = :dateFormat AND n.contenu_notification LIKE 'Une reunion%'
+                      WHERE :dateFormat <= r.date_reunion AND n.contenu_notification LIKE 'Une reunion%'
                       AND n.is_deleted = FALSE AND dr.role_joue='Chargé du compte-rendu'
                       ORDER BY r.date_reunion";
         $params = [

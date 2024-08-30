@@ -108,16 +108,17 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
             $requete = "SELECT COUNT(*) AS total FROM notifications AS n
                       INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
                       INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-            WHERE n.date_notification= '$dateFormat' AND
-                  (d.libelle_direction='".$rowId['libelle_direction']."'
+            WHERE   (d.libelle_direction='".$rowId['libelle_direction']."'
                       OR d.id_direction=0)
-                    ";
+                      AND (( '$dateFormat' <= date_reunion)
+                      OR date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat')";
+
               }else {
                 $requete = "SELECT COUNT(*) AS total FROM notifications AS n
                           INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
                           INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-                WHERE n.date_notification= '$dateFormat'
-                        ";
+                WHERE (( '$dateFormat' <= date_reunion)
+                OR date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat')";
               }
             $exe_requete = $con->query($requete);
             $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
@@ -151,13 +152,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
               WHERE (d.libelle_direction='".$rowId['libelle_direction']."'
                     OR d.id_direction=0) AND
                     contenu_notification LIKE 'Une reunion%'
-                     AND date_notification='$dateFormat'";
+                     AND ('$dateFormat' <= date_reunion)";
                   }else {
                     $requete = "SELECT COUNT(*) AS total FROM notifications AS n
                     INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
                     INNER JOIN directions AS d  ON d.id_direction=r.directions_id
                     WHERE  contenu_notification LIKE 'Une reunion%'
-                           AND date_notification='$dateFormat'";
+                    AND ('$dateFormat' <= date_reunion)";
                   }
               $exe_requete = $con->query($requete);
               if ($exe_requete) {
@@ -188,13 +189,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                WHERE   (d.libelle_direction='".$rowId['libelle_direction']."'
                           OR d.id_direction=0)
                       AND contenu_notification LIKE'Un compte-rendu%'
-                      AND date_notification = '$dateFormat'";
+                       AND date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'";
                 } else {
                   $requete = "SELECT COUNT(*) AS total FROM notifications AS n
                   INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
                   INNER JOIN directions AS d  ON d.id_direction=r.directions_id
                    WHERE contenu_notification LIKE'Un compte-rendu%'
-                          AND date_notification = '$dateFormat'";
+                       AND date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'";
                 }
               $exe_requete = $con->query($requete);
               $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
