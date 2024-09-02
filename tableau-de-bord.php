@@ -40,13 +40,30 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
+  <style>
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+}
+
+.preloader-message {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
+}
+</style>
 </head>
 <body  class="hold-transition sidebar-mini layout-fixed">
   <!-- Preloader -->
-
- <div class="preloader flex-column justify-content-center align-items-center">
-   <img class="animation__shake" src="dist/img/ordi.png" alt="AdminLTELogo" height="150" width="150">
- </div>
+  <div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__shake" src="dist/img/ordi.png" alt="Gest-Meet" height="150" width="150">
+    <p class="preloader-message">Veuillez patienter, le contenu est en cours de chargement...</p>
+  </div>
 
   <?php
     $username = $_SESSION['username'];
@@ -103,113 +120,132 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
           <a class="nav-link" data-toggle="dropdown" href="#">
             <i class="far fa-bell"></i>
             <?php
-            // Total des Nouvelle notifications
-            if (!$directeurConnect) {
-            $requete = "SELECT COUNT(*) AS total FROM notifications AS n
-                      INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
-                      INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-            WHERE   (d.libelle_direction='".$rowId['libelle_direction']."'
-                      OR d.id_direction=0)
-                      AND (( '$dateFormat' <= date_reunion)
-                      OR date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat')";
+      // Calculer le total des notifications
+      if (!$directeurConnect) {
+          $requete_total = "SELECT COUNT(*) AS total FROM notifications AS n
+                            INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
+                            INNER JOIN directions AS d ON d.id_direction=r.directions_id
+                            WHERE (d.libelle_direction='".$rowId['libelle_direction']."'
+                                   OR d.id_direction=0)
+                            AND (( '$dateFormat' <= date_reunion)
+                            OR date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat')";
+      } else {
+          $requete_total = "SELECT COUNT(*) AS total FROM notifications AS n
+                            INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
+                            INNER JOIN directions AS d ON d.id_direction=r.directions_id
+                            WHERE (( '$dateFormat' <= date_reunion)
+                            OR date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat')";
+      }
 
-              }else {
-                $requete = "SELECT COUNT(*) AS total FROM notifications AS n
-                          INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
-                          INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-                WHERE (( '$dateFormat' <= date_reunion)
-                OR date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat')";
-              }
-            $exe_requete = $con->query($requete);
-            $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
-            if ($row['total'] > 0){ ?>
-            <span class="badge badge-warning navbar-badge"><?php echo $row['total']; ?></span>
-          <?php } ?>
-          </a>
-          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">
-              <?php if($row['total'] > 0) {echo $row['total'];}
-              if ($row['total'] == 1) {
-                 echo"   Notification</span>";
-              }elseif ($row['total'] > 1) {
-                echo"   Notifications</span>";
-              }else{
-              echo"   Pas de notification</span> ";
-              }
-                ?>
-            <div class="dropdown-divider"></div>
-            <?php
-            $parametre2 = 'Nouvelle-reunion';
-            $url = 'reunions.php?parametre2=' . urlencode($parametre2);
-            ?>
-            <a href="<?php echo $url ?>" class="dropdown-item">
+      $exe_requete_total = $con->query($requete_total);
+      $row_total = $exe_requete_total->fetch(PDO::FETCH_ASSOC);
+      $total_notifications = $row_total['total'];
+
+      // Calculer les nouvelles réunions
+      if (!$directeurConnect) {
+          $requete_reunions = "SELECT COUNT(*) AS total FROM notifications AS n
+                               INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
+                               INNER JOIN directions AS d ON d.id_direction=r.directions_id
+                               WHERE (d.libelle_direction='".$rowId['libelle_direction']."'
+                                      OR d.id_direction=0)
+                               AND contenu_notification LIKE 'Une reunion%'
+                               AND ('$dateFormat' <= date_reunion)";
+      } else {
+          $requete_reunions = "SELECT COUNT(*) AS total FROM notifications AS n
+                               INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
+                               INNER JOIN directions AS d ON d.id_direction=r.directions_id
+                               WHERE contenu_notification LIKE 'Une reunion%'
+                               AND ('$dateFormat' <= date_reunion)";
+      }
+
+      $exe_requete_reunions = $con->query($requete_reunions);
+      $row_reunions = $exe_requete_reunions->fetch(PDO::FETCH_ASSOC);
+      $total_reunions = $row_reunions['total'];
+
+      // Calculer les nouveaux comptes-rendus
+      if (!$directeurConnect) {
+          $requete_comptes_rendus = "SELECT COUNT(*) AS total FROM notifications AS n
+                                     INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
+                                     INNER JOIN directions AS d ON d.id_direction=r.directions_id
+                                     WHERE (d.libelle_direction='".$rowId['libelle_direction']."'
+                                            OR d.id_direction=0)
+                                     AND contenu_notification LIKE 'Un compte-rendu%'
+                                     AND date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'";
+      } else {
+          $requete_comptes_rendus = "SELECT COUNT(*) AS total FROM notifications AS n
+                                     INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
+                                     INNER JOIN directions AS d ON d.id_direction=r.directions_id
+                                     WHERE contenu_notification LIKE 'Un compte-rendu%'
+                                     AND date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'";
+      }
+
+      $exe_requete_comptes_rendus = $con->query($requete_comptes_rendus);
+      $row_comptes_rendus = $exe_requete_comptes_rendus->fetch(PDO::FETCH_ASSOC);
+      $total_comptes_rendus = $row_comptes_rendus['total'];
+
+      // Calculer le nombre total de notifications distinctes
+      $nombre_notifications = $total_reunions + $total_comptes_rendus;
+
+      // Afficher les notifications
+      if ($nombre_notifications > 0) { ?>
+          <span class="badge badge-warning navbar-badge"><?php echo $nombre_notifications; ?></span>
+      <?php } ?>
+      </a>
+      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">
               <?php
-              //Nouvelles reunions  programmées
-              if (!$directeurConnect) {
-              $requete = "SELECT COUNT(*) AS total FROM notifications AS n
-              INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
-              INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-              WHERE (d.libelle_direction='".$rowId['libelle_direction']."'
-                    OR d.id_direction=0) AND
-                    contenu_notification LIKE 'Une reunion%'
-                     AND ('$dateFormat' <= date_reunion)";
-                  }else {
-                    $requete = "SELECT COUNT(*) AS total FROM notifications AS n
-                    INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
-                    INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-                    WHERE  contenu_notification LIKE 'Une reunion%'
-                    AND ('$dateFormat' <= date_reunion)";
-                  }
-              $exe_requete = $con->query($requete);
-              if ($exe_requete) {
-                $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
+              if ($nombre_notifications > 0) {
+                  echo $nombre_notifications;
+              }
+              if ($nombre_notifications == 1) {
+                  echo " Notification";
+              } elseif ($nombre_notifications > 1) {
+                  echo " Notifications";
+              } else {
+                  echo " Pas de notification";
               }
               ?>
+          </span>
+          <div class="dropdown-divider"></div>
+          <?php
+          $parametre2 = 'Nouvelle-reunion';
+          $url = 'reunions.php?parametre2=' . urlencode($parametre2);
+          ?>
+          <a href="<?php echo $url ?>" class="dropdown-item">
               <i class="fas fa-users mr-2"></i>
-              <?php if($row['total'] > 0) {echo $row['total'];}
-              if ($row['total'] == 1) {
-                 echo" Nouvelle réunion";
-              }elseif ($row['total'] > 1) {
-                echo" Nouvelles réunions";
-              }else{
-              echo"   Pas de nouvelle réunion ";
-              }  ?>
-            </a>
-            <div class="dropdown-divider"></div>
-            <?php
-            $parametre = 'nouveau-compte-rendu';
-            $url = 'liste-des-comptes-rendus.php?parametre=' . urlencode($parametre);
-            ?>
-            <a href="<?php echo $url ?>" class="dropdown-item">
               <?php
-            if (!$directeurConnect) {
-              $requete = "SELECT COUNT(*) AS total FROM notifications AS n
-              INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
-              INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-               WHERE   (d.libelle_direction='".$rowId['libelle_direction']."'
-                          OR d.id_direction=0)
-                      AND contenu_notification LIKE'Un compte-rendu%'
-                       AND date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'";
-                } else {
-                  $requete = "SELECT COUNT(*) AS total FROM notifications AS n
-                  INNER JOIN reunions AS r ON r.id_reunion=n.reunion_id
-                  INNER JOIN directions AS d  ON d.id_direction=r.directions_id
-                   WHERE contenu_notification LIKE'Un compte-rendu%'
-                       AND date_notification BETWEEN DATE_SUB('$dateFormat', INTERVAL 6 DAY) AND '$dateFormat'";
-                }
-              $exe_requete = $con->query($requete);
-              $row = $exe_requete->fetch(PDO::FETCH_ASSOC);
+              if ($total_reunions > 0) {
+                  echo $total_reunions;
+              }
+              if ($total_reunions == 1) {
+                  echo " Nouvelle réunion";
+              } elseif ($total_reunions > 1) {
+                  echo " Nouvelles réunions";
+              } else {
+                  echo " Pas de nouvelle réunion";
+              }
               ?>
+          </a>
+          <div class="dropdown-divider"></div>
+          <?php
+          $parametre = 'nouveau-compte-rendu';
+          $url = 'liste-des-comptes-rendus.php?parametre=' . urlencode($parametre);
+          ?>
+          <a href="<?php echo $url ?>" class="dropdown-item">
               <i class="fas fa-file mr-2"></i>
-              <?php if($row['total'] > 0) {echo $row['total'];}
-               if ($row['total'] == 1) {
-                  echo"  nouveau compte-rendu";
-               }elseif ($row['total'] > 1) {
-                 echo"  nouveaux compte-rendus";
-               }else{
-               echo"   Pas de nouveau compte-rendu ";
-               }   ?>
-            </a>
+              <?php
+              if ($total_comptes_rendus > 0) {
+                  echo $total_comptes_rendus;
+              }
+              if ($total_comptes_rendus == 1) {
+                  echo " Nouveau compte-rendu";
+              } elseif ($total_comptes_rendus > 1) {
+                  echo " Nouveaux compte-rendus";
+              } else {
+                  echo " Pas de nouveau compte-rendu";
+              }
+              ?>
+          </a>
             <div class="dropdown-divider"></div>
             <a href="notifications.php" class="dropdown-item dropdown-footer">Voir toutes les Notifications</a>
           </div>

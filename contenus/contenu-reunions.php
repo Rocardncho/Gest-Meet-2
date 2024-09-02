@@ -9,9 +9,9 @@
         </div>
         <div class="col-sm-6">
         <form class="" action="" method="get">
-            <input type="search" size="30" name="recherche" value="<?php if (isset($_GET['recherche'])) {
+            <input type="search" size="50" name="recherche" value="<?php if (isset($_GET['recherche'])) {
               echo $_GET['recherche'];
-            } ?>" placeholder="Recherchez par date ou par objret" required>
+            } ?>" placeholder="Recherchez par date ou par objret ou par date(EX: 2024-09-13)" required>
             <button type="submit" name="bt_rech">Recherchez</button>
         </form>
         </div>
