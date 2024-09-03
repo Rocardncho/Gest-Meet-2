@@ -142,12 +142,12 @@
             <tr>
                 <th>Sous-directions</th>
                 <td>Mise à jour</td>
-                <tr>
-                    <div class="d-flex justify-content-between">
+                <td>
+                     <div class="d-flex justify-content-between">
                         <div class="text-success">Modifier</div>
                         <div class="text-danger">Supprimer</div>
                     </div>
-                </th>
+                </td>
             </tr>
             </thead>
             <tbody>
