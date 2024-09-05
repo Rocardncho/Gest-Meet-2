@@ -1,6 +1,6 @@
 <div class="container mt-5">
   <?php
-  // Requête pour compter le nombre de réunions programmées
+  // Requête pour compter le nombre de réunions programmées.//.
   if (!$directeurConnect) {
     $requete = "SELECT COUNT(*) AS total FROM directions d
                 INNER JOIN reunions AS r ON d.id_direction = r.directions_id
